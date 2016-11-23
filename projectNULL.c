@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <ncurses.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 #include "ventanales.h"
-#include "shout.h"
-#include "choose.h"
 #include "choices.h"
 #include "global.h"
 #include "cervatillo.h"
@@ -16,14 +15,14 @@
 
 int main(){
 //them good ol ints
-int x,y=0,hl,c=0;
+int x,y=0,hl,c=0,maxx=0,maxy=0;
 //sigue vivo?
 bool vivo[2]={1,1},turn=1;
 //para los jugadores y su token
 char pk[50],* p;
 p=&pk[0];
-//para el menu
-WINDOW *m,*main;
+//para el menu (ahora en globales)
+WINDOW *m,*dock,*main, *diag;
 hl=1;
 //arroja resultados aletorios diferentes cada segundo paro
 
@@ -34,104 +33,125 @@ srand((unsigned) time(&t));
 initscr();
 cbreak();
 
-//Abilitamos todas las teclas para la ventana estandar
-//Assignamos a la tecla <F1> la funcion de cerrar ventana 
+//Abilitamos todas las teclas para la ventana standar 
 keypad(stdscr,1);
 
 initx=(80-width)/2;
 inity=(24-length)/2;
 
-printw("Presione <F4> para cerrar ventanas\n");
-refresh();
-main=mkwin(length,width,inity,initx,1);
+//Obtenemos las dimensiones de la ventana
+getmaxyx(stdscr,maxy,maxx);
 
-while((c = getch()) != KEY_F(4)){
-keypad(main,1);	
-	switch(c){
-		case KEY_LEFT:
-			rmwin(main);
-			main=mkwin(length,width,inity,--initx,1);
-		break;
-		case KEY_RIGHT:
-			rmwin(main);
-			main=mkwin(length,width,inity,++initx,0);
-		break;
-		case KEY_UP:
-			rmwin(main);
-			main=mkwin(length,width,--inity,initx,1);
-		break;
-		case KEY_DOWN:
-			rmwin(main);
-			main=mkwin(length,width,++inity,initx,0);
-		break;
-		case 10:
-			break;
-		break;
-		}
+
+//inicializamos 2 ventanas dentro de stdscr
+dock=mkwin(3,maxx,maxy-3,0,1);
+diag=mkwin(maxy-3,maxx,0,0,1);
+main=subwin(diag,maxy-5,maxx-2,1,1);
+
+mvwprintw(dock,0,0,"Dock");
+mvwprintw(diag,0,0,"Main");
+
+wrefresh(dock);
+wrefresh(diag);
+
+sleep(5);
+
+mvwprintw(main,1,1,"Un lindo dia cualquiera te encuentras caminando muy campante hacia el pueblo vecino. Cuando muy depronto...\n");
+mvwprintw(main,2,1,"Volteas a ver a un chavo medio raro directo a los ojos. Este muchacho parece tener solo una cosa en mente, lentamente se acerca hacia ti con una mirada intensa q trata de penetrar hasta tu alma. Sin dejar pasar un segundo exclama:\n");
+wrefresh(main);
+
+sleep(2);
+
+wclear(main);
+mvwprintw(main,1,1,"I like shorts!\nthey're comfy and easy to wear");
+wrefresh(main);
+mvwprintw(dock,2,2,"Vs. Shorts Guy");
+wrefresh(dock);
+
+
+wclear(main);
+mvwprintw(main,1,1,"En el panico del momento logras recordar que un profesor solitario alguna vez te regalo una pequeña creatura muy poderosa tratando de quedar bn con tu madre\n");
+wrefresh(main);
+
+sleep(1);
+
+wclear(main);	
+mvwprintw(main,1,1,"Pero cual era...?\n\n\n\t1) Charmander\n\t2) Bulbasor\n\t3) Squirtle\n\n>>");
+wrefresh(main);
+wscanw(main,"%d",&x);
+switch(x){
+	case 1:
+		strcpy(pk,"Charmander");
+	break;
+	case 2:
+		strcpy(pk,"Bulbasor");
+	break;
+	case 3:
+		strcpy(pk,"Squirtle");
+	break;
+	default:
+		strcpy(pk,"Psyduck");
 	}
-endwin();
-initscr();
+wrefresh(main);
+
+sleep(1);
+
+wclear(main);
+mvwprintw(main,1,1,"Tan pronto recuerdas su nombre dejas escapar una sonrisa con aire de superioridad. Tan solo te toma un segundo alcanzar la pokebola de tu mochila, las palabras se escuren de de tu boca como si no fueran tuyas\n%s YO TE ELIJO!\n",pk);
+wrefresh(main);
+
+sleep(2);
+
+wclear(main);
+mvwprintw(main,1,30,"Novato, crees poder vencerme con ese pequeño %s",pk);
+wrefresh(main);
+
+sleep(2);
 
 
-printw("Un lindo dia cualquiera te encuentras caminando muy campante hacia el pueblo vecino. Cuando muy depronto...\n");
-printw("Volteas a ver a un chavo medio raro directo a los ojos. Este muchacho parece tener solo una cosa en mente, lentamente se acerca hacia ti con una mirada intensa q trata de penetrar hasta tu alma. Sin dejar pasar un segundo exclama:\n");
-getch();
-shout();
-getch();
-clear();
+wclear(main);
+mvwprintw(main,1,30,"Arbok, yo te elijoooooooo!");
+wrefresh(main);
 
-printw("En el panico del momento logras recordar que un profesor solitario alguna vez te regalo una pequeña creatura muy poderosa tratando de quedar bn con tu madre\n");
-choose(p);
-clear();
-
-
-printw("Tan pronto recuerdas su nombre dejas escapar una sonrisa con aire de superioridad. Tan solo te toma un segundo alcanzar la pokebola de tu mochila, las palabras se escuren de de tu boca como si no fueran tuyas\n%s YO TE ELIJO!\n",pk);
-getch();
-clear();
-endwin();
-
-
-
-mvprintw(0,30,"Novato, crees poder vencerme con ese pequeño %s",pk);
-getch();
-clear();
-mvprintw(0,30,"Arbok, yo te elijoooooooo!");
-getch();
-clear();
-
+sleep(2);
 
 do{
-
-	//WINDOW *sandense=subwin(*)
 
 		hit[turn]=rand()%2;
 		dano[turn]=(rand()%3)+1;
 		
-		mvprintw(6,0,"Jugador %d, Es su turno",turn+1);
+		wclear(main);
+		mvwprintw(main,6,0,"Jugador %d, Es su turno",turn+1);
+		wrefresh(main);
 		getch();
-		clear();
+		wclear(main);
 	
-		mvprintw(1,60,"Arbok");
+		mvwprintw(main,1,60,"Arbok");
 		for(x=4;x>=dt[0];x--)
-			mvprintw(2,60+x,"=");
-		mvprintw(2,57,"HP(");
-		mvprintw(2,65,")");
+			mvwprintw(main,2,60+x,"=");
+		mvwprintw(main,2,57,"HP(");
+		mvwprintw(main,2,65,")");
+		wrefresh(main);
 		getch();
 		
-		mvprintw(20,5,"%s",pk);
+		mvwprintw(main,20,5,"%s",pk);
 		for(x=4;x>=dt[1];x--)
-			mvprintw(21,5+x,"=");
-		mvprintw(21,2,"HP(");
-		mvprintw(21,10,")");
+			mvwprintw(main,21,5+x,"=");
+		mvwprintw(main,21,2,"HP(");
+		mvwprintw(main,21,10,")");
+		wrefresh(main);
 		getch();
 
 
-clear();
 noecho();
 cbreak();
 initx=(80-width)/2;
 inity=(24-length)/2;
-m=newwin(length,width,inity,initx);
+
+
+
+
+m=subwin(main,length,width,inity,initx);
 keypad(m,1);
 mvprintw(6,0,"Utilize las flechas para resaltar su eleccion, presione enter para escoger");
 refresh();
@@ -164,8 +184,7 @@ while(1){
 	if(c!=0)
 		break;
 	}
-mvprintw(17,0,"Bn, uds opto por la opcion %d) %s",c,escoje[c-1]);
-getch();
+mvwprintw(main,17,0,"Bn, uds opto por la opcion %d) %s",c,escoje[c-1]);
 clrtoeol();
 refresh();
 vivo[turn]=cervatillo(c,turn);

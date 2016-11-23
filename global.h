@@ -16,6 +16,7 @@ char *escoje[]={
 	"Duerme\n",
 	};
 
+
 //let it be random
 int n=sizeof(escoje)/sizeof(char *);
 #endif
