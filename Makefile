@@ -3,7 +3,7 @@ OUTPUT=projectBbPacoStanley
 CFLAGS=-std=c99
 VFLAGS=-t -Wall -Wextra
 LDFLAGS=-lm -lncurses
-DEPS=choices.h choose.h shout.h cervatillo.h global.h ventanales.h
+DEPS=choices.h cervatillo.h global.h ventanales.h
 
 
 all : projectNULL.o
@@ -17,10 +17,6 @@ verbal : projectNULL.o
 projectNULL.o : projectNULL.c $(DEPS)
 	cc -c -g $< -o $@ $(LDFLAGS)
 choices.o : choices.h
-	cc -c -g $< -o $@ $(LDFLAGS)
-choose.o :  choose.h
-	cc -c -g $< -o $@ $(LDFLAGS)
-shout.o :  shout.h
 	cc -c -g $< -o $@ $(LDFLAGS)
 cervatillo.o : cervatillo.h
 	cc -c -g $< -o $@ $(LDFLAGS)
